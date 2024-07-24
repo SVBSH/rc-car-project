@@ -25,3 +25,10 @@ This project demonstrates how to control motors connected to an Arduino using a 
 - Connect the RX pin of NodeMCU to the TX pin of Arduino.
 - Connect the GND of NodeMCU to the GND of Arduino.
 
+## Related Documentation Links
+
+[ESP8266 - Soft Access Point](https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/soft-access-point-examples.html)
+
+[ESP8266 - Github](https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi)
+
+
