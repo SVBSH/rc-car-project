@@ -1,6 +1,11 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
+
+IPAddress local_IP(192,168,4,22);
+IPAddress gateway(192,168,4,9);
+IPAddress subnet(255,255,255,0);
+
 const char *ssid = "MyWiFiHotspot";
 const char *password = "password123";
 
@@ -12,6 +17,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println("NodeMCU serial started");
 
+  WiFi.softAPConfig(local_IP, gateway, subnet);
   // Nastavenie NodeMCU ako prístupový bod (AP)
   WiFi.softAP(ssid, password);
 
