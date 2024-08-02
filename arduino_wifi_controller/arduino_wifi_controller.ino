@@ -1,10 +1,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
-
-IPAddress local_IP(192,168,4,22);
-IPAddress gateway(192,168,4,9);
-IPAddress subnet(255,255,255,0);
+IPAddress local_IP(192, 168, 4, 22);
+IPAddress gateway(192, 168, 4, 9);
+IPAddress subnet(255, 255, 255, 0);
 
 const char *ssid = "MyWiFiHotspot";
 const char *password = "password123";
@@ -12,7 +11,8 @@ const char *password = "password123";
 // Vytvorenie HTTP servera
 ESP8266WebServer server(80);
 
-void setup() {
+void setup()
+{
   // Inicializácia sériovej komunikácie
   Serial.begin(9600);
   Serial.println("NodeMCU serial started");
@@ -36,24 +36,28 @@ void setup() {
   Serial.println("HTTP server running");
 }
 
-void loop() {
+void loop()
+{
   // Spracovanie prichádzajúcich požiadaviek
   server.handleClient();
 }
 
 // Funkcia na spracovanie požiadavky na koreňovú URL ("/")
-void handleRoot() {
+void handleRoot()
+{
   server.send(200, "text/plain", "Use /ledon or /ledoff to control the LED.");
 }
 
 // Funkcia na zapnutie LED
-void handleLEDOn() {
+void handleLEDOn()
+{
   Serial.println("LEDON");
   server.send(200, "text/plain", "LED is turned on");
 }
 
 // Funkcia na vypnutie LED
-void handleLEDOff() {
+void handleLEDOff()
+{
   Serial.println("LEDOFF");
   server.send(200, "text/plain", "LED is turned off");
 }
