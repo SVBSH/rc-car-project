@@ -17,21 +17,12 @@ void setup()
   Serial.begin(9600);
   Serial.println("NodeMCU serial started");
 
-  WiFi.softAPConfig(local_IP, gateway, subnet);
-  // Nastavenie NodeMCU ako prístupový bod (AP)
-  WiFi.softAP(ssid, password);
+  configureWebServer(server);
 
-  // Získanie IP adresy prístupového bodu
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("Hotspot IP Address: ");
-  Serial.println(IP);
+  setLedEndpoints(server);
+  setCarControllEndpoints(server);
 
-  // Definovanie spracovania HTTP požiadaviek
-  server.on("/", HTTP_GET, handleRoot);
-  server.on("/ledon", HTTP_GET, handleLEDOn);
-  server.on("/ledoff", HTTP_GET, handleLEDOff);
-
-  // Spustenie servera
+  // run server
   server.begin();
   Serial.println("HTTP server running");
 }
@@ -40,6 +31,50 @@ void loop()
 {
   // Spracovanie prichádzajúcich požiadaviek
   server.handleClient();
+}
+
+void configureWebServer(ESP8266WebServer &server)
+{
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+  // Nastavenie NodeMCU ako prístupový bod (AP)
+  WiFi.softAP(ssid, password);
+
+  // Získanie IP adresy prístupového bodu
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("Hotspot IP Address: ");
+  Serial.println(IP);
+}
+
+void setLedEndpoints(ESP8266WebServer &server)
+{
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/ledon", HTTP_GET, handleLEDOn);
+  server.on("/ledoff", HTTP_GET, handleLEDOff);
+}
+
+void setCarControllEndpoints(ESP8266WebServer &server)
+{
+  server.on("/control/forward", HTTP_GET, handleControlForward);
+  server.on("/control/right", HTTP_GET, handleControlRight);
+  server.on("/control/left", HTTP_GET, handleControlLeft);
+}
+
+void handleControlForward()
+{
+  Serial.println("CONTROL_FORWARD");
+  server.send(200, "text/plain", "CONTROL_FORWARD");
+}
+
+void handleControlRight()
+{
+  Serial.println("CONTROL_RIGHT");
+  server.send(200, "text/plain", "CONTROL_RIGHT");
+}
+
+void handleControlLeft()
+{
+  Serial.println("CONTROL_LEFT");
+  server.send(200, "text/plain", "CONTROL_LEFT");
 }
 
 // Funkcia na spracovanie požiadavky na koreňovú URL ("/")
