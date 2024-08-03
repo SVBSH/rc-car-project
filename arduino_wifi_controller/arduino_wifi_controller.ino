@@ -11,6 +11,68 @@ const char *password = "password123";
 // Vytvorenie HTTP servera
 ESP8266WebServer server(80);
 
+const char *index_html = R"rawliteral(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Control</title>
+    <style>
+        /* Inline CSS */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .control-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .control-btn {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        // Inline JavaScript
+        const API_URL = 'http://192.168.4.22';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const controlContainer = document.querySelector('.control-container');
+            controlContainer.addEventListener('click', (e) => {
+                const currButton = e.target.closest('.control-btn');
+                if (currButton === null) {
+                    return;
+                }
+                const btnType = currButton.dataset.type;
+                handleCarControl(btnType);
+            });
+        });
+
+        async function handleCarControl(btnType) {
+            try {
+                const request = `${API_URL}/control/${btnType}`;
+                console.log(request);
+                const response = await fetch(request, { mode: 'no-cors' });
+                console.log(response);
+            } catch (e) {
+                console.log('Error: ', e);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="control-container">
+        <button class="control-btn" data-type="forward">UP</button>
+        <button class="control-btn" data-type="backward">DOWN</button>
+        <button class="control-btn" data-type="left">LEFT</button>
+        <button class="control-btn" data-type="right">RIGHT</button>
+    </div>
+</body>
+</html>
+)rawliteral";
+
 void setup()
 {
   // Inicializácia sériovej komunikácie
@@ -19,8 +81,12 @@ void setup()
 
   configureWebServer(server);
 
-  setLedEndpoints(server);
+  // setLedEndpoints(server);
   setCarControllEndpoints(server);
+
+  // Serve index.html
+  server.on("/", HTTP_GET, []()
+            { server.send(200, "text/html", index_html); });
 
   // run server
   server.begin();
@@ -47,9 +113,9 @@ void configureWebServer(ESP8266WebServer &server)
 
 void setLedEndpoints(ESP8266WebServer &server)
 {
-  server.on("/", HTTP_GET, handleRoot);
-  server.on("/ledon", HTTP_GET, handleLEDOn);
-  server.on("/ledoff", HTTP_GET, handleLEDOff);
+  // server.on("/", HTTP_GET, handleRoot);
+  // server.on("/ledon", HTTP_GET, handleLEDOn);
+  // server.on("/ledoff", HTTP_GET, handleLEDOff);
 }
 
 void setCarControllEndpoints(ESP8266WebServer &server)
