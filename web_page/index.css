@@ -73,8 +73,10 @@ textarea:not([rows]) {
 }
 
 body {
+    padding: 0;
     display: grid;
     place-content: center;
+    background-color: #244f57;
 }
 
 .control-container {
@@ -84,4 +86,25 @@ body {
 
 .active {
     background-color: lime;
+}
+
+.control-btn {
+    border: none;
+    padding: 1rem;
+
+
+    &[data-type="left"]  {
+        margin-left: 2rem;
+        transform: rotate(270deg);
+    }
+    &[data-type="right"] {
+        transform: rotate(90deg);
+    }
+    &[data-type="forward"] {
+        
+    }
+    &[data-type="backward"] {
+        transform: rotate(180deg);
+    }
+
 }

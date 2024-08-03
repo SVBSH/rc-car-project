@@ -114,8 +114,8 @@ void configureWebServer(ESP8266WebServer &server)
 void setLedEndpoints(ESP8266WebServer &server)
 {
   // server.on("/", HTTP_GET, handleRoot);
-  // server.on("/ledon", HTTP_GET, handleLEDOn);
-  // server.on("/ledoff", HTTP_GET, handleLEDOff);
+  server.on("/ledon", HTTP_GET, handleLEDOn);
+  server.on("/ledoff", HTTP_GET, handleLEDOff);
 }
 
 void setCarControllEndpoints(ESP8266WebServer &server)
