@@ -29,8 +29,7 @@ void initLED()
 
 void loop()
 {
-  motor_1.run(BACKWARD);
-  motor_2.run(BACKWARD);
+
   motor_3.run(BACKWARD);
   motor_4.run(BACKWARD);
   delay(3000);
@@ -64,5 +63,35 @@ void handleCommand(String command)
   else if (command == "LEDOFF")
   {
     digitalWrite(LED_PIN, LOW); // Vypnúť LED
+  }
+  else if (command == "CONTROL_FORWARD")
+  {
+    motor_1.run(BACKWARD);
+    motor_2.run(BACKWARD);
+    motor_3.run(BACKWARD);
+    motor_4.run(BACKWARD);
+  }
+  else if (command == "CONTROL_BACKWARD")
+  {
+    motor_1.run(BACKWARD);
+    motor_2.run(BACKWARD);
+    motor_3.run(BACKWARD);
+    motor_4.run(BACKWARD);
+  }
+  else if (command == "CONTROL_RIGHT")
+  {
+    motor_2.run(BACKWARD);
+    motor_3.run(BACKWARD);
+
+    motor_1.run(RELEASE);
+    motor_4.run(RELEASE);
+  }
+  else if (command == "CONTROL_LEFT")
+  {
+    motor_1.run(BACKWARD);
+    motor_4.run(BACKWARD);
+
+    motor_2.run(RELEASE);
+    motor_3.run(RELEASE);
   }
 }

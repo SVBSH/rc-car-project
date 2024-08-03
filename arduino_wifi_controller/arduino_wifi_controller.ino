@@ -57,6 +57,7 @@ void setCarControllEndpoints(ESP8266WebServer &server)
   server.on("/control/forward", HTTP_GET, handleControlForward);
   server.on("/control/right", HTTP_GET, handleControlRight);
   server.on("/control/left", HTTP_GET, handleControlLeft);
+  server.on("/control/backward", HTTP_GET, handleControlLeft);
 }
 
 void handleControlForward()
@@ -75,6 +76,12 @@ void handleControlLeft()
 {
   Serial.println("CONTROL_LEFT");
   server.send(200, "text/plain", "CONTROL_LEFT");
+}
+
+void handleControlBackward()
+{
+  Serial.println("CONTROL_LEFT");
+  server.send(200, "text/plain", "CONTROL_BACKWARD");
 }
 
 // Funkcia na spracovanie požiadavky na koreňovú URL ("/")
