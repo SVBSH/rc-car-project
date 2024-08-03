@@ -57,7 +57,14 @@ void setCarControllEndpoints(ESP8266WebServer &server)
   server.on("/control/forward", HTTP_GET, handleControlForward);
   server.on("/control/right", HTTP_GET, handleControlRight);
   server.on("/control/left", HTTP_GET, handleControlLeft);
-  server.on("/control/backward", HTTP_GET, handleControlLeft);
+  server.on("/control/backward", HTTP_GET, handleControlBackward);
+  server.on("/control/stop", HTTP_GET, handleControlStop);
+}
+
+void handleControlStop()
+{
+  Serial.println("CONTROL_STOP");
+  server.send(200, "text/plain", "CONTROL_STOP");
 }
 
 void handleControlForward()
@@ -80,7 +87,7 @@ void handleControlLeft()
 
 void handleControlBackward()
 {
-  Serial.println("CONTROL_LEFT");
+  Serial.println("CONTROL_BACKWARD");
   server.send(200, "text/plain", "CONTROL_BACKWARD");
 }
 

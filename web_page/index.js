@@ -22,13 +22,21 @@ document.addEventListener('keydown', (e) => {
             btnType = 'right';
             break;
         default:
-            return; // Exit if the key is not one of the arrow keys
+            return; 
     }
+
     const button = document.querySelector(`.control-btn[data-type="${btnType}"]`);
         if (button) {
-            // button.classList.add('active')
-            // button.classList.remove('active')
-            button.click(); // Simulate button click
+            if (currButton !== null) {
+                currButton.classList.remove('active')
+                if (currButton.dataset.type === btnType) {
+                    console.log('already clicked');
+                    return
+                }
+            }
+            currButton = button
+            currButton.classList.add('active')
+            button.click();
     }}
 )
 

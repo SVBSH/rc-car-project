@@ -29,29 +29,21 @@ void initLED()
 
 void loop()
 {
+  if (Serial.available() > 0)
+  {
+    String command = Serial.readStringUntil('\n');
+    Serial.print("Command:");
+    Serial.println(command);
+    command.trim();
+    Serial.println("");
 
-  motor_3.run(BACKWARD);
-  motor_4.run(BACKWARD);
-  delay(3000);
-
-  motor_1.run(RELEASE);
-  motor_2.run(RELEASE);
-  motor_3.run(RELEASE);
-  motor_4.run(RELEASE);
-
-  delay(2000);
-
-  // Skontrolujte, či sú k dispozícii dáta zo sériovej linky
-  // if (Serial.available() > 0)
-  // {
-  //   String command = Serial.readStringUntil('\n');
-  //   Serial.print("Command:");
-  //   Serial.println(command);
-  //   command.trim();
-  //   Serial.println("");
-
-  //   handleCommand(command);
-  // }
+    handleCommand(command);
+    delay(2000);
+    motor_1.run(RELEASE);
+    motor_2.run(RELEASE);
+    motor_3.run(RELEASE);
+    motor_4.run(RELEASE);
+  }
 }
 
 void handleCommand(String command)
@@ -78,7 +70,7 @@ void handleCommand(String command)
     motor_3.run(BACKWARD);
     motor_4.run(BACKWARD);
   }
-  else if (command == "CONTROL_RIGHT")
+  else if (command == "CONTROL_LEFT")
   {
     motor_2.run(BACKWARD);
     motor_3.run(BACKWARD);
@@ -86,12 +78,19 @@ void handleCommand(String command)
     motor_1.run(RELEASE);
     motor_4.run(RELEASE);
   }
-  else if (command == "CONTROL_LEFT")
+  else if (command == "CONTROL_RIGHT")
   {
     motor_1.run(BACKWARD);
     motor_4.run(BACKWARD);
 
     motor_2.run(RELEASE);
     motor_3.run(RELEASE);
+  }
+  else if (command == "CONTROL_STOP")
+  {
+    motor_1.run(RELEASE);
+    motor_2.run(RELEASE);
+    motor_3.run(RELEASE);
+    motor_4.run(RELEASE);
   }
 }
