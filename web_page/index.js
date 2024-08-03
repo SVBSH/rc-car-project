@@ -47,7 +47,7 @@ async function handleCarControl(btnType) {
     try {
         const request = `${API_URL}/control/${btnType}`
         console.log(request);
-        const response = await fetch(request, {mode: 'no-cors'})
+        const response = await fetch(request)
         console.log(response);
     } catch(e) {
         console.log('Error: ', e)
