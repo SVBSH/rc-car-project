@@ -20,7 +20,6 @@ document.addEventListener("keydown", (e) => {
   switch (e.key) {
     case "ArrowUp":
       btnType = "forward";
-
       break;
     case "ArrowDown":
       btnType = "backward";
@@ -41,31 +40,65 @@ document.addEventListener("keydown", (e) => {
   button.click();
 });
 
-controlContainer.addEventListener("click", (e) => {
+controlContainer.addEventListener("click", handleButtonClick);
+controlContainer.addEventListener("touchstart", handleButtonTouch); // Added touch event support
+controlContainer.addEventListener("touchend", handleButtonRelease); // Added touch end support
+
+function handleButtonClick(e) {
+  const btnType = e.target.closest(".control-btn")?.dataset.type;
+  if (!btnType) {
+    return;
+  }
+
   if (currButton) {
-    currButton?.classList.toggle("active");
+    currButton.classList.toggle("active");
   }
 
   currButton = e.target.closest(".control-btn");
-
-  if (currButton === null) {
+  currButton.classList.toggle("active");
+  handleCarControl(btnType);
+}
+// Refactored click and touch handling function
+function handleButtonTouch(e) {
+  const btnType = e.target.closest(".control-btn")?.dataset.type;
+  if (!btnType) {
     return;
   }
 
+  if (currButton) {
+    currButton.classList.toggle("active");
+  }
+
+  currButton = e.target.closest(".control-btn");
   currButton.classList.toggle("active");
-  const btnType = currButton.dataset.type;
-  handleCarControl(btnType);
-});
+  // Start sending messages while the button is held down
+  sendControlMessages(btnType);
+}
+
+function handleButtonRelease(e) {
+  if (currButton) {
+    currButton.classList.toggle("active");
+  }
+  currButton = null;
+  // Stop sending messages when the button is released
+  stopControlMessages();
+}
+
+let controlInterval;
+
+function sendControlMessages(btnType) {
+  controlInterval = setInterval(() => {
+    handleCarControl(btnType);
+  }, 30); // Send message every 100ms
+}
+
+function stopControlMessages() {
+  clearInterval(controlInterval);
+}
 
 async function handleCarControl(btnType) {
   try {
-    const request = `${API_URL}/control/${btnType}`;
     webSocket.send(btnType);
-
-    return;
-    console.log(request);
-    const response = await fetch(request, { mode: "no-cors" });
-    console.log(response);
   } catch (e) {
     console.log("Error: ", e);
   }

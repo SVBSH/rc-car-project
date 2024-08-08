@@ -2,18 +2,19 @@
 #include <ESPAsyncWebServer.h>
 #include "LittleFS.h"
 #include <WebSocketsServer.h>
+#include "env.h"
 
 #define USE_SERIAL Serial
 IPAddress local_IP(192, 168, 4, 22);
 IPAddress gateway(192, 168, 4, 9);
 IPAddress subnet(255, 255, 255, 0);
 
-const char *ssid = "MyWiFiHotspot";
-const char *password = "password123";
-
-AsyncWebServer server(80);
+AsyncWebServer web_server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
+// Handles WebSocket events such as connection, disconnection, and incoming text messages.
+// It sends appropriate responses based on the received commands
+// (e.g., "forward", "backward", "left", "right").
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 {
 
@@ -39,53 +40,47 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     // send message to client
     // webSocket.sendTXT(num, "message here");
 
-    // send data to all connected clients
-    // webSocket.broadcastTXT("message here");
-    String direction = ""; // Declare direction outside the if-else blocks
+    String direction = "";
     if (strcmp((const char *)payload, "forward") == 0)
     {
-      direction = "CONTROL_FORWARD"; // Assign value to direction
+      direction = "CONTROL_FORWARD";
     }
     else if (strcmp((const char *)payload, "backward") == 0)
     {
-      direction = "CONTROL_BACKWARD"; // Assign value to direction
+      direction = "CONTROL_BACKWARD";
     }
     else if (strcmp((const char *)payload, "left") == 0)
     {
-      direction = "CONTROL_LEFT"; // Assign value to direction
+      direction = "CONTROL_LEFT";
     }
     else if (strcmp((const char *)payload, "right") == 0)
     {
-      direction = "CONTROL_RIGHT"; // Assign value to direction
+      direction = "CONTROL_RIGHT";
     }
     else
     {
       return;
     }
 
-    webSocket.sendTXT(num, ("Moving " + direction).c_str()); // Convert String to const char*
+    webSocket.sendTXT(num, ("Moving " + direction).c_str());
     Serial.println(direction);
 
     break;
   }
 }
 
-void configureWebServer(AsyncWebServer &server)
+// Configures the WiFi access point with a specified local IP, gateway, and subnet.
+// Initializes the access point with the provided SSID and password.
+void configureWebServer(AsyncWebServer &web_server)
 {
   WiFi.softAPConfig(local_IP, gateway, subnet);
-  WiFi.softAP(ssid, password);
+  WiFi.softAP(SSID, PASSWORD);
   IPAddress IP = WiFi.softAPIP();
   Serial.print("Hotspot IP Address: ");
   Serial.println(IP);
 }
 
-void setLedEndpoints(AsyncWebServer &server)
-{
-  server.on("/ledon", HTTP_GET, handleLEDOn);
-  server.on("/ledoff", HTTP_GET, handleLEDOff);
-}
-
-// Initialize LittleFS
+// Initializes the LittleFS file system
 void initFS()
 {
   if (!LittleFS.begin())
@@ -98,39 +93,50 @@ void initFS()
   }
 }
 
-// Funkcia na zapnutie LED
 void handleLEDOn(AsyncWebServerRequest *request)
 {
   Serial.println("LEDON");
   request->send(200, "text/plain", "LED is turned on");
 }
 
-// Funkcia na vypnutie LED
 void handleLEDOff(AsyncWebServerRequest *request)
 {
   Serial.println("LEDOFF");
   request->send(200, "text/plain", "LED is turned off");
 }
 
+// Sets up the endpoints for controlling the LED (turning it on and off) using the specified web server.
+void setLedEndpoints(AsyncWebServer &web_server)
+{
+  web_server.on("/ledon", HTTP_GET, handleLEDOn);
+  web_server.on("/ledoff", HTTP_GET, handleLEDOff);
+}
+
+// Configures the web server to serve the main HTML page and associated CSS and JavaScript files from the LittleFS file system.
+void setWebPageHosting(AsyncWebServer *web_server)
+{
+  web_server->on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+                 { request->send(LittleFS, "/index.html", "text/html"); });
+  web_server->on("/index.css", HTTP_GET, [](AsyncWebServerRequest *request)
+                 { request->send(LittleFS, "/index.css", "text/css"); });
+  web_server->on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request)
+                 { request->send(LittleFS, "/index.js", "text/javascript"); });
+}
+
+// Initializes the serial communication, configures the web server, sets up the web page hosting, initializes the file system, and starts the web server and WebSocket.
 void setup()
 {
   Serial.begin(9600);
   Serial.println("NodeMCU serial started");
 
-  configureWebServer(server);
+  configureWebServer(web_server);
 
-  // setLedEndpoints(server);
+  // setLedEndpoints(web_server);
+  setWebPageHosting(&web_server);
   initFS();
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/index.html", "text/html"); });
-  server.on("/index.css", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/index.css", "text/css"); });
-  server.on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/index.js", "text/javascript"); });
-
-  server.begin();
-  Serial.println("HTTP server running");
+  web_server.begin();
+  Serial.println("HTTP web_server running");
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
 }
