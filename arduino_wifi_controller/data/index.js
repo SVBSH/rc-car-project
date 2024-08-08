@@ -65,7 +65,8 @@ function handleButtonTouch(e) {
     return;
   }
 
-  if (currButton) {
+  // Deselect the previous button if it's different
+  if (currButton && currButton !== e.target.closest(".control-btn")) {
     currButton.classList.toggle("active");
   }
 
@@ -89,7 +90,7 @@ let controlInterval;
 function sendControlMessages(btnType) {
   controlInterval = setInterval(() => {
     handleCarControl(btnType);
-  }, 30); // Send message every 100ms
+  }, 30);
 }
 
 function stopControlMessages() {
